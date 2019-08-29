@@ -1,0 +1,15 @@
+{
+  "name": "vidly-api",
+  "version": "0.0.0",
+  "description": "A project from Node.js course. A backend for vidly app, built in Mastering React course.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ivan Bespalov",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/joi": "^15.1.1",
+    "express": "^4.17.1"
+  }
+}

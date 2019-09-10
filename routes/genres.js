@@ -1,30 +1,7 @@
-const Joi = require("@hapi/joi");
 const express = require("express");
-const mongoose = require("mongoose");
+
+const { Genre, validate } = require("../models/genre");
 const router = express.Router();
-
-const Genre = mongoose.model(
-  "Genre",
-  new mongoose.Schema({
-    name: {
-      type: String,
-      required: true,
-      minlength: 5,
-      maxlength: 50
-    }
-  })
-);
-
-function validateGenre(genre) {
-  const schema = {
-    name: Joi.string()
-      .required()
-      .min(5)
-      .max(50)
-  };
-
-  return Joi.validate(genre, schema);
-}
 
 router.get("/", async (req, res) => {
   try {
@@ -49,9 +26,8 @@ router.get("/:id", async (req, res) => {
 });
 
 // Create new genre
-
 router.post("/", async (req, res) => {
-  const { error } = validateGenre(req.body);
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   let genre = new Genre({ name: req.body.name });
@@ -66,9 +42,8 @@ router.post("/", async (req, res) => {
 });
 
 // Update existing genre
-
 router.put("/:id", async (req, res) => {
-  const { error } = validateGenre(req.body);
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   const genre = await Genre.findByIdAndUpdate(
@@ -83,7 +58,6 @@ router.put("/:id", async (req, res) => {
 });
 
 // Delete existing genre
-
 router.delete("/:id", async (req, res) => {
   const genre = await Genre.findByIdAndRemove(req.params.id);
   if (!genre)

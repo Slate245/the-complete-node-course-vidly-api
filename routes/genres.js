@@ -3,29 +3,24 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
 
-mongoose
-  .connect("mongodb://localhost/vidly", {
-    useNewUrlParser: true,
-    useFindAndModify: false
+const Genre = mongoose.model(
+  "Genre",
+  new mongoose.Schema({
+    name: {
+      type: String,
+      required: true,
+      minlength: 5,
+      maxlength: 50
+    }
   })
-  .then(() => console.log("Connected to MongoDB..."))
-  .catch(err => console.error("Could not connect to MongoDB...", err));
-
-const genreSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    minlength: 3
-  }
-});
-
-const Genre = mongoose.model("Genre", genreSchema);
+);
 
 function validateGenre(genre) {
   const schema = {
     name: Joi.string()
       .required()
-      .min(3)
+      .min(5)
+      .max(50)
   };
 
   return Joi.validate(genre, schema);
@@ -33,7 +28,7 @@ function validateGenre(genre) {
 
 router.get("/", async (req, res) => {
   try {
-    const genres = await Genre.find({});
+    const genres = await Genre.find().sort("name");
     res.send(genres);
   } catch (ex) {
     for (let field in ex.errors) console.log(ex.errors[field].message);
@@ -59,13 +54,11 @@ router.post("/", async (req, res) => {
   const { error } = validateGenre(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const genre = new Genre({
-    name: req.body.name
-  });
+  let genre = new Genre({ name: req.body.name });
 
   try {
-    const result = await genre.save();
-    res.send(result);
+    genre = await genre.save();
+    res.send(genre);
   } catch (ex) {
     for (let field in ex.errors) console.log(ex.errors[field].message);
     return res.status(500).send("Server encountered an error.");
@@ -78,35 +71,25 @@ router.put("/:id", async (req, res) => {
   const { error } = validateGenre(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  try {
-    const genre = await Genre.findById(req.params.id);
-    if (!genre)
-      return res.status(404).send("Genre with a given ID was not found");
+  const genre = await Genre.findByIdAndUpdate(
+    req.params.id,
+    { name: req.body.name },
+    { new: true }
+  );
+  if (!genre)
+    return res.status(404).send("Genre with a given ID was not found");
 
-    genre.name = req.body.name;
-    const result = await genre.save();
-    res.send(result);
-  } catch (ex) {
-    for (let field in ex.errors) console.log(ex.errors[field].message);
-    return res.status(500).send("Server encountered an error.");
-  }
+  res.send(genre);
 });
 
 // Delete existing genre
 
 router.delete("/:id", async (req, res) => {
-  try {
-    const genre = await Genre.findById(req.params.id);
-    if (!genre)
-      return res.status(404).send("Genre with a given ID was not found");
+  const genre = await Genre.findByIdAndRemove(req.params.id);
+  if (!genre)
+    return res.status(404).send("Genre with a given ID was not found");
 
-    const result = await genre.remove();
-
-    res.send(result);
-  } catch (ex) {
-    for (let field in ex.errors) console.log(ex.errors[field].message);
-    return res.status(500).send("Server encountered an error.");
-  }
+  res.send(genre);
 });
 
 module.exports = router;

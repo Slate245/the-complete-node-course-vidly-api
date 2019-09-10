@@ -13,7 +13,7 @@ const Customer = mongoose.model(
       minlength: 2,
       maxlength: 50
     },
-    phone: { type: String, required: true, minlength: 5 }
+    phone: { type: String, required: true, minlength: 5, maxlength: 50 }
   })
 );
 
@@ -24,7 +24,10 @@ function validateCustomer(customer) {
       .required()
       .min(2)
       .max(50),
-    phone: Joi.string().required()
+    phone: Joi.string()
+      .required()
+      .min(5)
+      .max(50)
   };
 
   return Joi.validate(customer, schema);

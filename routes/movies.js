@@ -1,6 +1,7 @@
 const express = require("express");
 
 const { Movie, validate } = require("../models/movie");
+const { Genre } = require("../models/genre");
 const router = express.Router();
 
 // Get all movies
@@ -23,8 +24,19 @@ router.post("/", async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { title, numberInStock, dailyRentalRate, genre } = req.body;
-  let movie = new Movie({ title, numberInStock, dailyRentalRate, genre });
+  const genre = Genre.findById(req.body.genreId);
+  if (!genre) return res.status(400).send("Invalid genre.");
+
+  const { title, numberInStock, dailyRentalRate } = req.body;
+  let movie = new Movie({
+    title,
+    numberInStock,
+    dailyRentalRate,
+    genre: {
+      _id: genre._id,
+      name: genre.name
+    }
+  });
   movie = await movie.save();
   res.send(movie);
 });
@@ -34,10 +46,21 @@ router.put("/:id", async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { title, numberInStock, dailyRentalRate, genre } = req.body;
+  const genre = Genre.findById(req.body.genreId);
+  if (!genre) return res.status(400).send("Invalid genre.");
+
+  const { title, numberInStock, dailyRentalRate } = req.body;
   const movie = await Movie.findByIdAndUpdate(
     req.params.id,
-    { title, numberInStock, dailyRentalRate, genre },
+    {
+      title,
+      numberInStock,
+      dailyRentalRate,
+      genre: {
+        _id: genre._id,
+        name: genre.name
+      }
+    },
     { new: true }
   );
   if (!movie)

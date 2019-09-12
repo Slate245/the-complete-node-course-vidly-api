@@ -37,11 +37,7 @@ router.put("/:id", async (req, res) => {
   const { isGold, name, phone } = req.body;
   const customer = await Customer.findByIdAndUpdate(
     req.params.id,
-    {
-      isGold,
-      name,
-      phone
-    },
+    { isGold, name, phone },
     { new: true }
   );
   if (!customer)

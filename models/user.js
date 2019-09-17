@@ -15,13 +15,13 @@ const User = mongoose.model(
       unique: true,
       required: true,
       minlength: 5,
-      maxlength: 50
+      maxlength: 255
     },
     password: {
       type: String,
       required: true,
       minlength: 5,
-      maxlength: 50
+      maxlength: 1024
     }
   })
 );
@@ -35,11 +35,12 @@ function validateUser(user) {
     email: Joi.string()
       .required()
       .min(5)
-      .max(50),
+      .max(255)
+      .email(),
     password: Joi.string()
       .required()
       .min(5)
-      .max(50)
+      .max(255)
   };
 
   return Joi.validate(user, schema);

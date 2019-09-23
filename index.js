@@ -9,6 +9,8 @@ const app = express();
 
 require("./startup/routes")(app);
 
+require("./startup/db");
+
 process.on("uncaughtException", ex => {
   console.log("WE GOT AN UNCAUGHT EXCEPTION");
   winston.error(ex.message, ex);

@@ -6,25 +6,16 @@ const { Genre, validate } = require("../models/genre");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  try {
-    const genres = await Genre.find().sort("name");
-    res.send(genres);
-  } catch (ex) {
-    for (let field in ex.errors) console.log(ex.errors[field].message);
-    return res.status(500).send("Server encountered an error.");
-  }
+  throw new Error("Could not get the genres.");
+  const genres = await Genre.find().sort("name");
+  res.send(genres);
 });
 
 router.get("/:id", async (req, res) => {
-  try {
-    const genre = await Genre.findById(req.params.id);
-    if (!genre)
-      return res.status(404).send("Genre with a given ID was not found");
-    res.send(genre);
-  } catch (ex) {
-    for (let field in ex.errors) console.log(ex.errors[field].message);
-    return res.status(500).send("Server encountered an error.");
-  }
+  const genre = await Genre.findById(req.params.id);
+  if (!genre)
+    return res.status(404).send("Genre with a given ID was not found");
+  res.send(genre);
 });
 
 // Create new genre

@@ -14,6 +14,7 @@ module.exports = function() {
       level: "error"
     })
   );
+  winston.add(new winston.transports.Console());
 
   process.on("unhandledRejection", ex => {
     throw ex;

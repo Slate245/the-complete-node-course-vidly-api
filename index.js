@@ -9,17 +9,14 @@ const app = express();
 
 require("./startup/routes")(app);
 
-require("./startup/db");
+require("./startup/db")();
 
-process.on("uncaughtException", ex => {
-  console.log("WE GOT AN UNCAUGHT EXCEPTION");
-  winston.error(ex.message, ex);
-  process.exit(1);
-});
+winston.exceptions.handle(
+  new winston.transports.File({ filename: "uncaughtExceptions.log" })
+);
 
 process.on("unhandledRejection", ex => {
-  console.log("WE GOT AN UNHANDLED REJECTION");
-  winston.error(ex.message, ex);
+  throw ex;
 });
 
 winston.add(new winston.transports.File({ filename: "logfile.log" }));

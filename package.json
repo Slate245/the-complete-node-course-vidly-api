@@ -4,7 +4,7 @@
   "description": "A project from Node.js course. A backend for vidly app, built in Mastering React course.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --watchAll",
     "nodemon": "nodemon",
     "run": "node index.js"
   },
@@ -14,6 +14,7 @@
     "@hapi/joi": "^15.1.1",
     "bcrypt": "^3.0.6",
     "config": "^3.2.2",
+    "eslint-plugin-jest": "^22.17.0",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
     "fawn": "^2.1.5",
@@ -23,5 +24,8 @@
     "mongoose": "^5.6.13",
     "winston": "^3.2.1",
     "winston-mongodb": "^5.0.0"
+  },
+  "devDependencies": {
+    "jest": "^24.9.0"
   }
 }

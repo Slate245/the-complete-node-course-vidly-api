@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "A project from Node.js course. A backend for vidly app, built in Mastering React course.",
   "main": "index.js",
+  "jest": {
+    "testEnvironment": "node"
+  },
   "scripts": {
     "test": "jest --watchAll",
     "nodemon": "nodemon",

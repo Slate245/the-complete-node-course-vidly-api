@@ -7,7 +7,9 @@ module.exports = function() {
     new winston.transports.File({ filename: "uncaughtExceptions.log" })
   );
 
-  winston.add(new winston.transports.File({ filename: "logfile.log" }));
+  winston.add(
+    new winston.transports.File({ filename: "logfile.log", level: "warn" })
+  );
   // winston.add(
   //   new winston.transports.MongoDB({
   //     db: "mongodb://localhost/vidly",

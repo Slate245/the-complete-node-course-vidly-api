@@ -103,4 +103,100 @@ describe("/api/genres", () => {
       expect(res.body).toHaveProperty("name", "genre1");
     });
   });
+
+  describe("PUT /:id", () => {
+    let token;
+    let updatedGenre;
+    let genre;
+    let id;
+    beforeEach(async () => {
+      token = new User().generateAuthToken();
+      genre = new Genre({ name: "genre1" });
+      id = genre._id;
+      await genre.save();
+      updatedGenre = { name: "updated" };
+    });
+
+    afterEach(async () => {
+      await Genre.collection.deleteMany({});
+    });
+
+    const exec = () => {
+      return request(server)
+        .put(`/api/genres/${id}`)
+        .set("x-auth-token", token)
+        .send(updatedGenre);
+    };
+
+    it("should update genre if it is valid", async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty("_id");
+      expect(res.body).toHaveProperty("name", updatedGenre.name);
+    });
+
+    it("should return 400 if genre is invalid", async () => {
+      updatedGenre = {};
+
+      const res = await exec();
+      genre = await Genre.findOne();
+
+      expect(res.status).toBe(400);
+      expect(genre.name).toBe("genre1");
+    });
+
+    it("should return 404 if no genre with a given ID is found", async () => {
+      id = mongoose.Types.ObjectId();
+
+      const res = await exec();
+      genre = await Genre.findOne();
+
+      expect(res.status).toBe(404);
+      expect(genre.name).toBe("genre1");
+    });
+  });
+
+  describe("DELETE /:id", () => {
+    let token;
+    let genre;
+    let id;
+    beforeEach(async () => {
+      token = new User({ isAdmin: true }).generateAuthToken();
+      genre = new Genre({ name: "genre1" });
+      id = genre._id;
+      await genre.save();
+    });
+    afterEach(async () => {
+      await Genre.collection.deleteMany({});
+    });
+
+    const exec = () => {
+      return request(server)
+        .delete(`/api/genres/${id}`)
+        .set("x-auth-token", token);
+    };
+
+    it("should delete genre if it is valid", async () => {
+      const res = await exec();
+
+      genre = await Genre.findOne();
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty("_id");
+      expect(res.body).toHaveProperty("name", "genre1");
+      expect(genre).toBeNull();
+    });
+
+    it("should should return 404 if genre with a given ID is not found", async () => {
+      id = mongoose.Types.ObjectId();
+
+      const res = await exec();
+      genre = await Genre.findOne();
+
+      expect(res.status).toBe(404);
+      expect(genre).toHaveProperty("_id");
+      expect(genre).toHaveProperty("name", "genre1");
+    });
+  });
 });

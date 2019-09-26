@@ -34,11 +34,22 @@ describe("/api/returns", () => {
     await Rental.deleteMany({});
   });
 
-  it("should return 401 if client is not logged in", async () => {
-    const res = await request(server)
+  const exec = () => {
+    return request(server)
       .post("/api/returns")
       .send({ customerId, movieId });
+  };
+
+  it("should return 401 if client is not logged in", async () => {
+    const res = await exec();
 
     expect(res.status).toBe(401);
+  });
+
+  it("should return 400 if customerId is not provided", async () => {
+    customerId = "";
+    const res = await exec();
+
+    expect(res.status).toBe(400);
   });
 });

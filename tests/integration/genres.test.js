@@ -155,6 +155,13 @@ describe("/api/genres", () => {
       expect(res.status).toBe(404);
       expect(genre.name).toBe("genre1");
     });
+
+    it("should return 401 if client is not logged in", async () => {
+      token = "";
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
   });
 
   describe("DELETE /:id", () => {
@@ -183,9 +190,14 @@ describe("/api/genres", () => {
       genre = await Genre.findOne();
 
       expect(res.status).toBe(200);
+      expect(genre).toBeNull();
+    });
+
+    it("should return the deleted genre", async () => {
+      const res = await exec();
+
       expect(res.body).toHaveProperty("_id");
       expect(res.body).toHaveProperty("name", "genre1");
-      expect(genre).toBeNull();
     });
 
     it("should should return 404 if genre with a given ID is not found", async () => {

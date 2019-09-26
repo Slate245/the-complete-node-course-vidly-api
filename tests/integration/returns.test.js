@@ -29,6 +29,8 @@ describe("/api/returns", () => {
       }
     });
     await rental.save();
+
+    token = new User().generateAuthToken();
   });
 
   afterEach(async () => {
@@ -36,31 +38,30 @@ describe("/api/returns", () => {
     await Rental.deleteMany({});
   });
 
+  const exec = () => {
+    return request(server)
+      .post("/api/returns")
+      .set("x-auth-token", token)
+      .send({ customerId, movieId });
+  };
+
   it("should return 401 if client is not logged in", async () => {
     token = "";
-    const res = await request(server)
-      .post("/api/returns")
-      .send({ customerId, movieId });
+    const res = await exec();
 
     expect(res.status).toBe(401);
   });
 
   it("should return 400 if customerId is not provided", async () => {
-    token = new User().generateAuthToken();
-    const res = await request(server)
-      .post("/api/returns")
-      .set("x-auth-token", token)
-      .send({ movieId });
+    customerId = "";
+    const res = await exec();
 
     expect(res.status).toBe(400);
   });
 
   it("should return 400 if movieId is not provided", async () => {
-    token = new User().generateAuthToken();
-    const res = await request(server)
-      .post("/api/returns")
-      .set("x-auth-token", token)
-      .send({ customerId });
+    movieId = "";
+    const res = await exec();
 
     expect(res.status).toBe(400);
   });

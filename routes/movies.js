@@ -7,8 +7,8 @@ const router = express.Router();
 
 // Get all movies
 router.get("/", async (req, res) => {
-  const customers = await Movie.find();
-  res.send(customers);
+  const movies = await Movie.findMany({});
+  res.send(movies);
 });
 
 // Get single movie

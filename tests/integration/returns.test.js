@@ -2,7 +2,6 @@ const request = require("supertest");
 const { Rental } = require("../../models/rental");
 const { User } = require("../../models/user");
 const { Movie } = require("../../models/movie");
-const { Genre } = require("../../models/genre");
 const mongoose = require("mongoose");
 const moment = require("moment");
 
@@ -36,9 +35,9 @@ describe("/api/returns", () => {
 
     movie = new Movie({
       _id: movieId,
-      title: rental.movie.title,
-      genre: new Genre({ name: "genre1" }),
-      dailyRentalRate: rental.movie.dailyRentalRate,
+      title: "12345",
+      genre: { name: "genre1" },
+      dailyRentalRate: 2,
       numberInStock: 0
     });
     await movie.save();
@@ -49,6 +48,7 @@ describe("/api/returns", () => {
   afterEach(async () => {
     await server.close();
     await Rental.deleteMany({});
+    await Movie.deleteMany({});
   });
 
   const exec = () => {
@@ -127,6 +127,6 @@ describe("/api/returns", () => {
 
     const movieInDb = await Movie.findById(movie._id);
 
-    expect(movieInDb.numberInStock).toEqual(1);
+    expect(movieInDb.numberInStock).toEqual(movie.numberInStock + 1);
   });
 });

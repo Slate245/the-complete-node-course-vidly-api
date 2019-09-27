@@ -22,17 +22,13 @@ router.post("/", auth, async (req, res) => {
   rental.dateReturned = new Date();
   const rentalDays = moment().diff(rental.dateOut, "days");
   rental.rentalFee = rentalDays * rental.movie.dailyRentalRate;
+  await rental.save();
 
-  const movie = await Movie.findByIdAndUpdate(
-    rental.movie._id,
-    {
-      $inc: { numberInStock: 1 }
-    },
-    { new: true }
+  await Movie.updateOne(
+    { _id: rental.movie._id },
+    { $inc: { numberInStock: 1 } }
   );
 
-  await rental.save();
-  await movie.save();
   return res.status(200).send("OK");
 });
 

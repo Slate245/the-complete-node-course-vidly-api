@@ -9,7 +9,10 @@
   "scripts": {
     "test": "jest --watchAll --verbose  --coverage --runInBand",
     "nodemon": "nodemon",
-    "run": "node index.js"
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": "10.16.3"
   },
   "author": "Ivan Bespalov",
   "license": "ISC",

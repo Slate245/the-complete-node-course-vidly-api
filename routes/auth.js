@@ -1,15 +1,13 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const Joi = require("@hapi/joi");
+const validate = require("../middleware/validate");
 
 const { User } = require("../models/user");
 const router = express.Router();
 
 // Register new user
-router.post("/", async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+router.post("/", validate(validateUser), async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
   if (!user) return res.status(400).send("Invalid email or password.");
 
@@ -20,7 +18,7 @@ router.post("/", async (req, res) => {
   res.send(token);
 });
 
-function validate(user) {
+function validateUser(user) {
   const schema = {
     email: Joi.string()
       .required()

@@ -95,4 +95,18 @@ describe("/api/returns", () => {
 
     expect(diff).toBeLessThan(10 * 1000);
   });
+
+  it("should set the rental fee if request is valid", async () => {
+    await exec();
+
+    const rentalInDb = await Rental.findById(rental._id);
+    let daysOut = Math.floor(
+      (rentalInDb.dateReturned - rentalInDb.dateOut) / 1000 / 3600 / 24
+    );
+    daysOut === 0 ? (daysOut = 1) : (daysOut = daysOut);
+    const rentalFee = daysOut * rentalInDb.movie.dailyRentalRate;
+    // rentalFee = (dateReturned - dateOut).toDays() * dailyRentalRate
+
+    expect(rentalInDb.rentalFee).toEqual(rentalFee);
+  });
 });

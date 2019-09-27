@@ -8,7 +8,7 @@ router.post("/", auth, async (req, res) => {
     return res.status(400).send("customerId not provided");
   if (!req.body.movieId) return res.status(400).send("movieId not provided");
 
-  const rental = await Rental.findOne({
+  let rental = await Rental.findOne({
     "customer._id": req.body.customerId,
     "movie._id": req.body.movieId
   });
@@ -17,6 +17,8 @@ router.post("/", auth, async (req, res) => {
   if (rental.dateReturned)
     return res.status(400).send("Return already processed");
 
+  rental.dateReturned = new Date();
+  await rental.save();
   return res.status(200).send("OK");
 });
 

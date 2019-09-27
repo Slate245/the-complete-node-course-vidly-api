@@ -86,4 +86,12 @@ describe("/api/returns", () => {
 
     expect(res.status).toBe(200);
   });
+
+  it("should set the return date", async () => {
+    await exec();
+
+    rental = await Rental.findOne();
+
+    expect(rental.dateReturned).toBeDefined();
+  });
 });

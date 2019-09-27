@@ -2,6 +2,7 @@ const request = require("supertest");
 const { Rental } = require("../../models/rental");
 const { User } = require("../../models/user");
 const mongoose = require("mongoose");
+const moment = require("moment");
 
 describe("/api/returns", () => {
   let server;
@@ -97,16 +98,17 @@ describe("/api/returns", () => {
   });
 
   it("should set the rental fee if request is valid", async () => {
+    rental.dateOut = moment()
+      .add(-7, "days")
+      .toDate();
+    await rental.save();
+
     await exec();
 
     const rentalInDb = await Rental.findById(rental._id);
-    let daysOut = Math.floor(
-      (rentalInDb.dateReturned - rentalInDb.dateOut) / 1000 / 3600 / 24
-    );
-    daysOut === 0 ? (daysOut = 1) : (daysOut = daysOut);
-    const rentalFee = daysOut * rentalInDb.movie.dailyRentalRate;
+
     // rentalFee = (dateReturned - dateOut).toDays() * dailyRentalRate
 
-    expect(rentalInDb.rentalFee).toEqual(rentalFee);
+    expect(rentalInDb.rentalFee).toEqual(14);
   });
 });

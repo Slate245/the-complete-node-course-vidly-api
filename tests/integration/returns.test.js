@@ -1,6 +1,8 @@
 const request = require("supertest");
 const { Rental } = require("../../models/rental");
 const { User } = require("../../models/user");
+const { Movie } = require("../../models/movie");
+const { Genre } = require("../../models/genre");
 const mongoose = require("mongoose");
 const moment = require("moment");
 
@@ -10,6 +12,7 @@ describe("/api/returns", () => {
   let movieId;
   let rental;
   let token;
+  let movie;
 
   beforeEach(async () => {
     server = require("../../index");
@@ -30,6 +33,15 @@ describe("/api/returns", () => {
       }
     });
     await rental.save();
+
+    movie = new Movie({
+      _id: movieId,
+      title: rental.movie.title,
+      genre: new Genre({ name: "genre1" }),
+      dailyRentalRate: rental.movie.dailyRentalRate,
+      numberInStock: 0
+    });
+    await movie.save();
 
     token = new User().generateAuthToken();
   });
@@ -107,8 +119,14 @@ describe("/api/returns", () => {
 
     const rentalInDb = await Rental.findById(rental._id);
 
-    // rentalFee = (dateReturned - dateOut).toDays() * dailyRentalRate
-
     expect(rentalInDb.rentalFee).toEqual(14);
+  });
+
+  it("should increase the movie stock", async () => {
+    await exec();
+
+    const movieInDb = await Movie.findById(movie._id);
+
+    expect(movieInDb.numberInStock).toEqual(1);
   });
 });
